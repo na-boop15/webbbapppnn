@@ -562,6 +562,48 @@ hr.div{border:none;border-top:1px solid var(--bd);margin:4px 0;}
         </div>
       </div>
 
+      <!-- ⑥ 빈 줄(공백 단락) 간격 -->
+      <div class="ep-section">
+        <div class="ep-sec-title">빈 줄(공백 단락) 간격</div>
+        <div style="font-size:10.5px;color:var(--mu);line-height:1.5;margin-bottom:6px;">본문 중 &lt;p&gt;&lt;br/&gt;&lt;/p&gt; 형태의 빈 줄이 앞뒤 문단 마진과 겹쳐 간격이 과하게 넓어지는 경우를 정리해요.</div>
+        <div class="ep-ck-row">
+          <input type="checkbox" id="ckBlankLine">
+          <label for="ckBlankLine">빈 줄 정리</label>
+          <span class="ep-default-badge" id="blankLineBadge">미체크 = 원본 유지</span>
+        </div>
+        <div id="blankLineControls" style="display:none;flex-direction:column;gap:9px;margin-top:6px;">
+          <div class="ep-ck-row" style="gap:18px;">
+            <label style="font-size:13px;color:var(--tx);cursor:pointer;display:flex;align-items:center;gap:5px;">
+              <input type="radio" name="blankMode" id="blankModeHeight" value="height" checked style="accent-color:var(--ac);width:15px;height:15px;cursor:pointer;">높이만 조절
+            </label>
+            <label style="font-size:13px;color:var(--tx);cursor:pointer;display:flex;align-items:center;gap:5px;">
+              <input type="radio" name="blankMode" id="blankModeRemove" value="remove" style="accent-color:var(--ac);width:15px;height:15px;cursor:pointer;">완전히 제거
+            </label>
+          </div>
+          <div id="blankHeightGroup" style="display:flex;flex-direction:column;gap:9px;">
+            <div class="ep-row">
+              <span class="ep-lbl">빈 줄 높이</span>
+              <input type="range" id="epBlankH" min="0.3" max="3" step="0.1" value="1" class="ep-rng">
+              <input type="number" id="epBlankHNum" min="0.3" max="3" step="0.1" value="1" class="num-input">
+              <span class="ep-val" id="lblEpBlankH">1em</span>
+            </div>
+            <div style="padding:8px 12px;background:var(--surf);border-radius:6px;border:1px solid var(--bd);">
+              <p style="margin:0 0 1.4em;font-size:13px;line-height:1.6;color:#222;">문단 A입니다.</p>
+              <p id="epBlankPreview" style="margin:0;line-height:1em;color:#222;font-size:13px;">&nbsp;</p>
+              <p style="margin:0.6em 0 0;font-size:13px;line-height:1.6;color:#222;">문단 B입니다.</p>
+            </div>
+            <div style="font-size:10.5px;color:var(--mu);line-height:1.5;">※ 빈 줄 마진만 0으로 만든 거라, 앞뒤 문단 자체 마진(위 0.6em·아래 1.4em)이 그대로 한 번씩 더해져서 일반 문단 사이 간격(1.4em)보다는 여전히 넓어요.</div>
+          </div>
+          <div id="blankRemoveGroup" style="display:none;flex-direction:column;gap:9px;">
+            <div style="padding:8px 12px;background:var(--surf);border-radius:6px;border:1px solid var(--bd);">
+              <p style="margin:0 0 1.4em;font-size:13px;line-height:1.6;color:#222;">문단 A입니다.</p>
+              <p style="margin:0.6em 0 0;font-size:13px;line-height:1.6;color:#222;">문단 B입니다. (빈 줄 없이 일반 문단 간격만 적용)</p>
+            </div>
+            <div style="font-size:10.5px;color:var(--mu);line-height:1.5;">※ 빈 줄을 아예 삭제해서, 다른 문단 사이 간격과 완전히 동일해져요. 원작자가 의도한 '한 줄 쉼'은 사라져요.</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
     <button class="btn btn-p" id="btnEpubSave" disabled>수정된 EPUB 저장하기</button>
@@ -1504,6 +1546,29 @@ function updateEpCommentPreview(){
   if(eld){eld.style.fontSize=fs+'%';eld.style.color=colorDark;}
 }
 
+/* 빈 줄(공백 단락) 간격 컨트롤 */
+document.getElementById('ckBlankLine').addEventListener('change',function(){
+  document.getElementById('blankLineControls').style.display=this.checked?'flex':'none';
+  document.getElementById('blankLineBadge').style.display=this.checked?'none':'inline-block';
+  updateEpBlankPreview();
+});
+document.querySelectorAll('input[name="blankMode"]').forEach(function(r){
+  r.addEventListener('change',function(){
+    var isHeight=document.getElementById('blankModeHeight').checked;
+    document.getElementById('blankHeightGroup').style.display=isHeight?'flex':'none';
+    document.getElementById('blankRemoveGroup').style.display=isHeight?'none':'flex';
+  });
+});
+document.getElementById('epBlankH').addEventListener('input',function(){
+  document.getElementById('lblEpBlankH').textContent=parseFloat(this.value).toFixed(1)+'em';
+  updateEpBlankPreview();
+});
+function updateEpBlankPreview(){
+  var h=document.getElementById('epBlankH').value;
+  var el=document.getElementById('epBlankPreview');
+  if(el)el.style.lineHeight=h+'em';
+}
+
 document.getElementById('btnEpubSave').addEventListener('click',async function(){
   if(!epubZip){toast('먼저 EPUB 파일을 선택하세요','err');return;}
   var btn=this;btn.disabled=true;btn.textContent='처리 중...';
@@ -1544,6 +1609,7 @@ document.getElementById('btnEpubSave').addEventListener('click',async function()
     var useScAlign=document.getElementById('ckScCenter').checked;
     var useScDim  =document.getElementById('ckScDetail').checked;
     var useComment=document.getElementById('ckComment').checked;
+    var useBlankLine=document.getElementById('ckBlankLine').checked;
 
     epProg(45,'원본 CSS 읽기...');
     /* CSS 파일 탐색 — 실제 챕터 xhtml이 <link>로 참조하는 CSS를 찾는다.
@@ -1687,6 +1753,32 @@ document.getElementById('btnEpubSave').addEventListener('click',async function()
           if(hi%20===0)await tick();
         }
       }
+    }
+
+    /* 빈 줄(공백 단락) 정리 — <p><br/></p> 형태가 앞뒤 문단 마진과 겹쳐
+       간격이 과하게 벌어지는 것을 처리. '높이만 조절'은 .blankline 클래스로
+       분리해 margin:0 + 원하는 높이만 적용(그래도 일반 문단 간격보단 넓음),
+       '완전히 제거'는 빈 줄 자체를 삭제해 일반 문단 간격과 동일하게 만듦 */
+    if(useBlankLine){
+      var blankMode=document.querySelector('input[name="blankMode"]:checked').value;
+      var blankRe=/<p(?![^>]*class=)([^>]*)>\s*(?:<br\s*\/?>|&nbsp;|\u00a0)\s*<\/p>/gi;
+      if(blankMode==='height'){
+        var blankH=document.getElementById('epBlankH').value;
+        patched=patchBlock(patched,'.blankline',{'margin':'0!important','line-height':blankH+'em!important'});
+      }
+      epProg(68,'빈 줄 정리 ('+htmlPathsAll.length+'개)...');
+      var blankCnt=0;
+      for(var bi=0;bi<htmlPathsAll.length;bi++){
+        var bp=htmlPathsAll[bi];
+        var bs=await workZip.file(bp).async('string');
+        var bsNew=bs.replace(blankRe,function(m,attrs){
+          blankCnt++;
+          return blankMode==='remove'?'':'<p class="blankline"'+attrs+'><br/></p>';
+        });
+        if(bsNew!==bs)workZip.file(bp,bsNew);
+        if(bi%20===0)await tick();
+      }
+      if(blankCnt)toast('빈 줄 '+blankCnt+'개 '+(blankMode==='remove'?'삭제됨':'정리됨'),'ok');
     }
 
     /* 제목 밑 구분선(hr) 제거 */
