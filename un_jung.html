@@ -246,13 +246,22 @@ hr.div{border:none;border-top:1px solid var(--bd);margin:4px 0;}
         <input type="number" id="commentFSNum" min="60" max="100" step="1" value="83" class="num-input">
       </div>
       <div style="display:flex;align-items:center;gap:6px;">
-        <label style="font-size:11px;font-family:'DM Mono',monospace;color:var(--mu);white-space:nowrap;">글자색</label>
+        <label style="font-size:11px;font-family:'DM Mono',monospace;color:var(--mu);white-space:nowrap;">글자색 (라이트)</label>
         <input type="color" id="commentColorPick" value="#666666" style="width:32px;height:28px;border:1.5px solid var(--bd);border-radius:6px;cursor:pointer;padding:2px;">
         <input type="text" id="commentColorHex" value="#666666" maxlength="7" style="flex:1;background:var(--s2);border:1.5px solid var(--bd);border-radius:6px;color:var(--tx);font-family:'DM Mono',monospace;font-size:12px;padding:6px 8px;outline:none;">
       </div>
       <div style="padding:8px 12px;background:var(--surf);border-radius:6px;border:1px solid var(--bd);">
         <p style="margin:0;font-size:14px;line-height:1.75;color:var(--tx);">그녀는 미소를 지으며 <span id="commentPreview" style="font-size:83%;color:#666666;">(살짝 고개를 기울이며)</span> 말했다.</p>
       </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <label style="font-size:11px;font-family:'DM Mono',monospace;color:var(--mu);white-space:nowrap;">글자색 (다크)</label>
+        <input type="color" id="commentColorPickDark" value="#aaaaaa" style="width:32px;height:28px;border:1.5px solid var(--bd);border-radius:6px;cursor:pointer;padding:2px;">
+        <input type="text" id="commentColorHexDark" value="#aaaaaa" maxlength="7" style="flex:1;background:var(--s2);border:1.5px solid var(--bd);border-radius:6px;color:var(--tx);font-family:'DM Mono',monospace;font-size:12px;padding:6px 8px;outline:none;">
+      </div>
+      <div style="padding:8px 12px;background:#1c1c1c;border-radius:6px;border:1px solid var(--bd);">
+        <p style="margin:0;font-size:14px;line-height:1.75;color:#e6e6e6;">그녀는 미소를 지으며 <span id="commentPreviewDark" style="font-size:83%;color:#aaaaaa;">(살짝 고개를 기울이며)</span> 말했다.</p>
+      </div>
+      <div style="font-size:10.5px;color:var(--mu);line-height:1.5;">※ 리더 앱이 시스템 다크모드를 인식할 때만 적용돼요 (대부분의 epub 리더가 지원)</div>
     </div>
     <hr class="div">
     <div class="slider-row">
@@ -521,13 +530,22 @@ hr.div{border:none;border-top:1px solid var(--bd);margin:4px 0;}
             <span class="ep-val" id="lblEpCommentFS">83%</span>
           </div>
           <div class="ep-row">
-            <span class="ep-lbl">글자 색상</span>
+            <span class="ep-lbl">글자 색상 (라이트)</span>
             <input type="color" id="epCommentColor" value="#666666" class="ep-color">
             <input type="text" id="epCommentColorHex" value="#666666" maxlength="7" style="flex:1;background:var(--s2);border:1.5px solid var(--bd);border-radius:6px;color:var(--tx);font-family:'DM Mono',monospace;font-size:12px;padding:6px 8px;outline:none;">
           </div>
           <div style="padding:8px 12px;background:var(--surf);border-radius:6px;border:1px solid var(--bd);margin-top:2px;">
             <p style="margin:0;font-size:13px;line-height:1.75;color:#222;">그녀는 미소를 지으며 <span id="epCommentPreview" style="font-size:83%;color:#666;">(살짝 고개를 기울이며)</span> 말했다.</p>
           </div>
+          <div class="ep-row">
+            <span class="ep-lbl">글자 색상 (다크)</span>
+            <input type="color" id="epCommentColorDark" value="#aaaaaa" class="ep-color">
+            <input type="text" id="epCommentColorHexDark" value="#aaaaaa" maxlength="7" style="flex:1;background:var(--s2);border:1.5px solid var(--bd);border-radius:6px;color:var(--tx);font-family:'DM Mono',monospace;font-size:12px;padding:6px 8px;outline:none;">
+          </div>
+          <div style="padding:8px 12px;background:#1c1c1c;border-radius:6px;border:1px solid var(--bd);margin-top:2px;">
+            <p style="margin:0;font-size:13px;line-height:1.75;color:#e6e6e6;">그녀는 미소를 지으며 <span id="epCommentPreviewDark" style="font-size:83%;color:#aaaaaa;">(살짝 고개를 기울이며)</span> 말했다.</p>
+          </div>
+          <div style="font-size:10.5px;color:var(--mu);line-height:1.5;">※ 리더 앱이 시스템 다크모드를 인식할 때만 적용돼요</div>
         </div>
       </div>
 
@@ -756,12 +774,17 @@ document.getElementById('togComment').addEventListener('change',function(){
 function updateCommentPreview(){
   var fs=document.getElementById('commentFS').value;
   var color=document.getElementById('commentColorHex').value;
+  var colorDark=document.getElementById('commentColorHexDark').value;
   var p=document.getElementById('commentPreview');
   if(p){p.style.fontSize=fs+'%';p.style.color=color;}
+  var pd=document.getElementById('commentPreviewDark');
+  if(pd){pd.style.fontSize=fs+'%';pd.style.color=colorDark;}
 }
 document.getElementById('commentFS').addEventListener('input',function(){document.getElementById('lblCommentFS').textContent=this.value;updateCommentPreview();});
 document.getElementById('commentColorPick').addEventListener('input',function(){document.getElementById('commentColorHex').value=this.value;updateCommentPreview();});
 document.getElementById('commentColorHex').addEventListener('input',function(){if(/^#[0-9a-fA-F]{6}$/.test(this.value))document.getElementById('commentColorPick').value=this.value;updateCommentPreview();});
+document.getElementById('commentColorPickDark').addEventListener('input',function(){document.getElementById('commentColorHexDark').value=this.value;updateCommentPreview();});
+document.getElementById('commentColorHexDark').addEventListener('input',function(){if(/^#[0-9a-fA-F]{6}$/.test(this.value))document.getElementById('commentColorPickDark').value=this.value;updateCommentPreview();});
 
 function prog(pct,lbl){var w=document.getElementById('progWrap');w.style.display='block';document.getElementById('progFill').style.width=pct+'%';document.getElementById('progLbl').textContent=lbl||'';if(pct>=100)setTimeout(function(){w.style.display='none';},900);}
 
@@ -811,12 +834,14 @@ async function buildEpub(){
     prog(15,'스타일 생성...');await tick();
     var commentFS=document.getElementById('commentFS').value||'83';
     var commentColor=document.getElementById('commentColorHex').value||'#666666';
+    var commentColorDark=document.getElementById('commentColorHexDark').value||'#aaaaaa';
     ob.file('style.css',
       'body{line-height:1.75;font-family:serif;}'
       +'p{margin:.6em 0 1.4em;'+(optI?'text-indent:1em;':'')+'}'
       +'h3{font-size:'+h3FS+'em;text-align:center;margin:'+h3MT+'em 0 '+h3MB+'em !important;padding:0;color:'+color+'!important;page-break-before:always;}'
       +'.scene{text-align:center;margin:2em 0;font-size:1.1em;color:'+color+';}'
       +'.comment{font-size:'+commentFS+'%;color:'+commentColor+';}'
+      +'@media (prefers-color-scheme: dark){.comment{color:'+commentColorDark+'!important;}}'
     );
     prog(25,'표지 처리...');await tick();
     var cExt='jpg',cMT='image/jpeg';
@@ -1424,6 +1449,27 @@ function patchBlock(css,sel,patches){
   return css.replace(re,function(){return m[1]+m[2]+m[3]+m[4]+block+m[6];});
 }
 
+/* prefers-color-scheme:dark 블록 안에 sel{...} 규칙을 추가/수정.
+   블록이 없으면 새로 만들고, 있으면 안쪽 내용에 patchBlock과 동일한 로직을 재사용. */
+function patchDarkBlock(css,sel,patches){
+  var mre=/@media\s*\(\s*prefers-color-scheme\s*:\s*dark\s*\)\s*\{/i;
+  var mm=mre.exec(css);
+  if(!mm){
+    var props=Object.entries(patches).map(function(e){return e[0]+':'+e[1];}).join(';');
+    return css+'\n@media (prefers-color-scheme: dark){\n'+sel+'{'+props+'}\n}';
+  }
+  var openIdx=mm.index+mm[0].length-1;
+  var depth=1,i=openIdx+1;
+  for(;i<css.length;i++){
+    if(css[i]==='{')depth++;
+    else if(css[i]==='}'){depth--;if(depth===0)break;}
+  }
+  var closeIdx=i;
+  var inner=css.slice(openIdx+1,closeIdx);
+  var newInner=patchBlock(inner,sel,patches);
+  return css.slice(0,openIdx+1)+newInner+css.slice(closeIdx);
+}
+
 /* 괄호 주석 컨트롤 */
 document.getElementById('ckComment').addEventListener('change',function(){
   document.getElementById('commentControls').style.display=this.checked?'flex':'none';
@@ -1441,11 +1487,21 @@ document.getElementById('epCommentColor').addEventListener('input',function(){
 document.getElementById('epCommentColorHex').addEventListener('input',function(){
   if(/^#[0-9a-fA-F]{6}$/.test(this.value)){document.getElementById('epCommentColor').value=this.value;updateEpCommentPreview();}
 });
+document.getElementById('epCommentColorDark').addEventListener('input',function(){
+  document.getElementById('epCommentColorHexDark').value=this.value;
+  updateEpCommentPreview();
+});
+document.getElementById('epCommentColorHexDark').addEventListener('input',function(){
+  if(/^#[0-9a-fA-F]{6}$/.test(this.value)){document.getElementById('epCommentColorDark').value=this.value;updateEpCommentPreview();}
+});
 function updateEpCommentPreview(){
   var fs=document.getElementById('epCommentFS').value;
   var color=document.getElementById('epCommentColor').value;
+  var colorDark=document.getElementById('epCommentColorDark').value;
   var el=document.getElementById('epCommentPreview');
   if(el){el.style.fontSize=fs+'%';el.style.color=color;}
+  var eld=document.getElementById('epCommentPreviewDark');
+  if(eld){eld.style.fontSize=fs+'%';eld.style.color=colorDark;}
 }
 
 document.getElementById('btnEpubSave').addEventListener('click',async function(){
@@ -1614,7 +1670,9 @@ document.getElementById('btnEpubSave').addEventListener('click',async function()
     if(useComment){
       var cFS=document.getElementById('epCommentFS').value;
       var cColor=document.getElementById('epCommentColor').value;
+      var cColorDark=document.getElementById('epCommentColorDark').value;
       patched=patchBlock(patched,'.'+commentClass,{'font-size':cFS+'%!important','color':cColor+'!important'});
+      patched=patchDarkBlock(patched,'.'+commentClass,{'color':cColorDark+'!important'});
       if(commentClass!=='comment'){
         toast('괄호 주석 클래스 감지: .'+commentClass,'ok');
       }else{
