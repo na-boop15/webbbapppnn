@@ -1730,6 +1730,22 @@ document.getElementById('btnEpubSave').addEventListener('click',async function()
     if(Object.keys(scPatches).length>0){
       patched=patchBlock(patched,'.'+sceneClass,scPatches);
       if(sceneClass!=='scene')toast('장면전환 클래스 감지: .'+sceneClass,'ok');
+      /* CSS만 지정해도 실제 본문의 "***"/"* * *" 등에 class가 없으면 적용이 안 되므로,
+         class 없이 기호만 들어있는 <p>/<div>를 찾아 자동으로 class를 붙여준다 */
+      var sceneBreakRe=new RegExp('<(p|div)(?![^>]*class=)([^>]*)>\\s*((?:[\\*\\-—–·•◆■○●♦※]\\s*){3,})\\s*<\\/\\1>','gi');
+      epProg(62,'장면전환 표시 자동 태깅 ('+htmlPathsAll.length+'개)...');
+      var sceneCnt=0;
+      for(var si=0;si<htmlPathsAll.length;si++){
+        var sp=htmlPathsAll[si];
+        var ss=await workZip.file(sp).async('string');
+        var ssNew=ss.replace(sceneBreakRe,function(m,tag,attrs,content){
+          sceneCnt++;
+          return '<'+tag+' class="'+sceneClass+'"'+attrs+'>'+content+'</'+tag+'>';
+        });
+        if(ssNew!==ss)workZip.file(sp,ssNew);
+        if(si%20===0)await tick();
+      }
+      if(sceneCnt)toast('장면전환 표시 '+sceneCnt+'개에 class 자동 적용됨','ok');
     }
 
     /* 괄호 주석 */
@@ -1739,6 +1755,11 @@ document.getElementById('btnEpubSave').addEventListener('click',async function()
       var cColorDark=document.getElementById('epCommentColorDark').value;
       patched=patchBlock(patched,'.'+commentClass,{'font-size':cFS+'%!important','color':cColor+'!important'});
       patched=patchDarkBlock(patched,'.'+commentClass,{'color':cColorDark+'!important'});
+      /* 회차 제목(h1~h4) 안에 (1), (2)처럼 같은 .comment 클래스가 같이 쓰이는 epub이 있어서,
+         본문에만 효과가 가게 제목 안에서는 강제로 원래 제목 스타일을 그대로 물려받게 함 */
+      ['h1','h2','h3','h4'].forEach(function(tag){
+        patched=patchBlock(patched,tag+' .'+commentClass,{'font-size':'inherit!important','color':'inherit!important'});
+      });
       if(commentClass!=='comment'){
         toast('괄호 주석 클래스 감지: .'+commentClass,'ok');
       }else{
