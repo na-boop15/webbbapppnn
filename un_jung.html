@@ -1732,15 +1732,15 @@ document.getElementById('btnEpubSave').addEventListener('click',async function()
       if(sceneClass!=='scene')toast('장면전환 클래스 감지: .'+sceneClass,'ok');
       /* CSS만 지정해도 실제 본문의 "***"/"* * *" 등에 class가 없으면 적용이 안 되므로,
          class 없이 기호만 들어있는 <p>/<div>를 찾아 자동으로 class를 붙여준다 */
-      var sceneBreakRe=new RegExp('<(p|div)(?![^>]*class=)([^>]*)>\\s*((?:[\\*\\-—–·•◆■○●♦※]\\s*){3,})\\s*<\\/\\1>','gi');
+      var sceneBreakRe=new RegExp('<(p|div)(?![^>]*class=)([^>]*)>(\\s*(?:<span[^>]*>)?\\s*(?:[\\*\\-—–·•◆■○●♦※]\\s*){3,}\\s*(?:<\\/span>)?\\s*(?:<br\\s*\\/?>)?\\s*)<\\/\\1>','gi');
       epProg(62,'장면전환 표시 자동 태깅 ('+htmlPathsAll.length+'개)...');
       var sceneCnt=0;
       for(var si=0;si<htmlPathsAll.length;si++){
         var sp=htmlPathsAll[si];
         var ss=await workZip.file(sp).async('string');
-        var ssNew=ss.replace(sceneBreakRe,function(m,tag,attrs,content){
+        var ssNew=ss.replace(sceneBreakRe,function(m,tag,attrs,inner){
           sceneCnt++;
-          return '<'+tag+' class="'+sceneClass+'"'+attrs+'>'+content+'</'+tag+'>';
+          return '<'+tag+' class="'+sceneClass+'"'+attrs+'>'+inner+'</'+tag+'>';
         });
         if(ssNew!==ss)workZip.file(sp,ssNew);
         if(si%20===0)await tick();
